@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agente Mi Casa Soluciones — instalación en la web</title>
+<style>
+  :root{
+    --ambar:#FFB000; --carbon:#393536; --negro:#100F0D; --blanco:#FFFFFF;
+    --arena:#F4F1EC; --verde:#1E7B4F; --gris:#8A8580;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--arena);color:var(--carbon)}
+
+  /* ---------- Botón flotante ---------- */
+  #mcs-burbuja{
+    position:fixed;right:20px;bottom:20px;width:62px;height:62px;border-radius:50%;
+    background:var(--ambar);border:none;cursor:pointer;z-index:2147483000;
+    box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:28px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #mcs-burbuja:hover{transform:scale(1.05)}
+  #mcs-burbuja .mcs-punto{
+    position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;
+    background:var(--verde);border:3px solid var(--blanco);display:none;
+  }
+  #mcs-burbuja.con-novedad .mcs-punto{display:block}
+
+  /* ---------- Ventana ---------- */
+  #mcs-ventana{
+    position:fixed;right:20px;bottom:94px;width:370px;max-width:calc(100vw - 32px);
+    height:560px;max-height:calc(100vh - 130px);background:var(--blanco);
+    border-radius:16px;overflow:hidden;display:none;flex-direction:column;
+    box-shadow:0 18px 50px rgba(0,0,0,.32);z-index:2147483000;
+    font-family:Inter,Arial,Helvetica,sans-serif;
+  }
+  #mcs-ventana.abierta{display:flex}
+
+  #mcs-cabecera{
+    background:var(--carbon);color:var(--blanco);padding:13px 16px;
+    display:flex;align-items:center;gap:11px;flex:none;
+  }
+  #mcs-cabecera .mcs-logo{
+    width:38px;height:38px;border-radius:10px;background:var(--ambar);
+    display:flex;align-items:center;justify-content:center;font-size:20px;flex:none;
+  }
+  #mcs-cabecera h1{margin:0;font-size:14px;font-weight:700;letter-spacing:.2px}
+  #mcs-cabecera p{margin:2px 0 0;font-size:11.5px;color:#c9c5c2}
+  #mcs-cerrar{margin-left:auto;background:none;border:none;color:#c9c5c2;font-size:22px;cursor:pointer;line-height:1;padding:0 4px}
+  #mcs-cerrar:hover{color:var(--blanco)}
+
+  #mcs-hilo{flex:1;overflow-y:auto;padding:14px;background:var(--arena);display:flex;flex-direction:column;gap:9px}
+  .mcs-msg{max-width:86%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+  .mcs-bot{align-self:flex-start;background:var(--blanco);border:1px solid #e6e2dc;border-bottom-left-radius:4px}
+  .mcs-yo{align-self:flex-end;background:var(--carbon);color:var(--blanco);border-bottom-right-radius:4px}
+  .mcs-aviso{
+    align-self:stretch;background:#FFF6E0;border:1px solid var(--ambar);border-radius:10px;
+    padding:9px 12px;font-size:12px;color:#6b4d00;
+  }
+  .mcs-escribiendo{align-self:flex-start;color:var(--gris);font-size:12.5px;padding:4px 8px}
+
+  #mcs-pie{flex:none;border-top:1px solid #e6e2dc;background:var(--blanco);padding:9px 10px;display:flex;gap:8px}
+  #mcs-texto{
+    flex:1;border:1px solid #ddd8d1;border-radius:10px;padding:9px 11px;font-size:13.5px;
+    font-family:inherit;resize:none;height:40px;max-height:100px;outline:none;color:var(--carbon);
+  }
+  #mcs-texto:focus{border-color:var(--ambar)}
+  #mcs-enviar{
+    background:var(--ambar);border:none;border-radius:10px;width:44px;cursor:pointer;
+    font-size:17px;color:var(--negro);flex:none;
+  }
+  #mcs-enviar:disabled{opacity:.5;cursor:default}
+
+  /* ---------- Panel interno (solo para Nelson / pruebas) ---------- */
+  #mcs-interno{
+    display:none;background:var(--negro);color:#d8d4d0;font-size:11.5px;
+    padding:10px 12px;max-height:190px;overflow:auto;white-space:pre-wrap;
+    border-top:2px solid var(--ambar);font-family:ui-monospace,Menlo,Consolas,monospace;
+  }
+  #mcs-interno.visible{display:block}
+  #mcs-interno a{color:var(--ambar)}
+</style>
+</head>
+<body>
+
+<!-- ====================================================================
+     Página de demostración. En la web real solo se pega:
+       1) el <style> de arriba
+       2) el <div id="mcs-raiz">...</div> con el botón y la ventana
+       3) el <script> del final, cambiando API_URL
+     ==================================================================== -->
+
+<div style="max-width:760px;margin:60px auto;padding:0 20px">
+  <div style="background:#fff;border-radius:14px;padding:28px;border:1px solid #e6e2dc">
+    <h1 style="margin:0 0 6px;font-size:22px;color:#393536">Agente de atención al cliente — Mi Casa Soluciones</h1>
+    <p style="color:#8A8580;margin:0 0 18px;font-size:14px">Página de prueba del agente <b>Sol</b>. Abra el botón ámbar de la esquina inferior derecha y converse como si fuera un cliente.</p>
+    <p style="font-size:14px;line-height:1.6;margin:0 0 10px"><b>Para probar las 25 pruebas de aceptación</b>, use esta página y copie los mensajes del documento <code>05_Pruebas_de_Aceptacion.md</code>.</p>
+    <p style="font-size:14px;line-height:1.6;margin:0 0 10px"><b>Panel interno:</b> pulse <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> (o agregue <code>?interno=1</code> a la dirección) para ver los avisos internos que el agente generó para Nelson.</p>
+    <p style="font-size:13px;color:#8A8580;margin:0">Este archivo se puede publicar tal cual en la web. Solo hay que cambiar la constante <code>API_URL</code> del script por la dirección del Worker.</p>
+  </div>
+</div>
+
+<!-- ===================== COMPONENTE DEL CHAT ===================== -->
+<button id="mcs-burbuja" aria-label="Abrir chat de atención">
+  <span aria-hidden="true">🔧</span><span class="mcs-punto"></span>
+</button>
+
+<div id="mcs-ventana" role="dialog" aria-label="Chat de Mi Casa Soluciones">
+  <div id="mcs-cabecera">
+    <div class="mcs-logo" aria-hidden="true">🏠</div>
+    <div>
+      <h1>Mi Casa Soluciones</h1>
+      <p>Sol · Asistente virtual · Lunes a sábado 07:00–19:00</p>
+    </div>
+    <button id="mcs-cerrar" aria-label="Cerrar">×</button>
+  </div>
+  <div id="mcs-hilo"></div>
+  <div id="mcs-pie">
+    <textarea id="mcs-texto" placeholder="Escriba su consulta…" rows="1"></textarea>
+    <button id="mcs-enviar" aria-label="Enviar">➤</button>
+  </div>
+  <div id="mcs-interno"></div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIGURACIÓN — lo único que hay que cambiar
+   ============================================================ */
+var API_URL = "https://agente-micasasoluciones.nelson-ojeda-traza-growth.workers.dev/chat";
+var WHATSAPP_NELSON = "593963303081";
+
+/* ============================================================
+   NO HACE FALTA TOCAR NADA DE AQUÍ PARA ABAJO
+   ============================================================ */
+(function () {
+  var burbuja = document.getElementById("mcs-burbuja");
+  var ventana = document.getElementById("mcs-ventana");
+  var hilo = document.getElementById("mcs-hilo");
+  var texto = document.getElementById("mcs-texto");
+  var enviar = document.getElementById("mcs-enviar");
+  var cerrar = document.getElementById("mcs-cerrar");
+  var interno = document.getElementById("mcs-interno");
+
+  var historial = [];
+  var ocupado = false;
+  var panelInterno = /[?&]interno=1/.test(location.search);
+
+  var SALUDO =
+    "¡Gracias por escribir a Mi Casa Soluciones! 🏠🔧\n" +
+    "Soy Sol, el asistente virtual. Le ayudo con gasfitería y termofusión, electricidad, " +
+    "soldadura, remodelación, pintura y gypsum.\n\n" +
+    "✅ Visita y presupuesto SIN COSTO en La Libertad y Salinas\n" +
+    "✅ Garantía escrita de 12 meses en mano de obra\n" +
+    "✅ Factura electrónica\n\n" +
+    "ℹ️ Le atiendo con un asistente virtual (IA). Sus datos se usan solo para atender su consulta " +
+    "y no se comparten con fines publicitarios. Si prefiere que le atienda una persona, escríbalo " +
+    "y le paso con Nelson.\n\n" +
+    "Cuénteme, ¿qué necesita resolver en su casa u obra?";
+
+  function agregar(t, clase) {
+    var d = document.createElement("div");
+    d.className = "mcs-msg " + clase;
+    d.textContent = t; // textContent: nunca se inyecta HTML del usuario
+    hilo.appendChild(d);
+    hilo.scrollTop = hilo.scrollHeight;
+    return d;
+  }
+
+  function mostrarInterno(aviso, tipo, prioridad, enviados, palabras, escalo) {
+    if (!panelInterno) return;
+    if (!aviso && !(palabras && palabras.length)) return;
+    interno.classList.add("visible");
+    interno.textContent = "";
+
+    var cab = document.createElement("div");
+    cab.textContent =
+      "PANEL INTERNO · " + (tipo || "OTRO") + " · " + (prioridad || "MEDIA") +
+      (enviados && enviados.length ? " · avisos enviados: " + enviados.length : " · sin canal de envío configurado");
+    interno.appendChild(cab);
+
+    if (!escalo) {
+      var alerta = document.createElement("div");
+      alerta.style.color = "#FFB000";
+      alerta.textContent =
+        "\n⚠️ PALABRAS CLAVE DETECTADAS (" + (palabras || []).join(", ") +
+        ") pero el agente respondió sin escalar. REVISAR ESTA CONVERSACIÓN.";
+      interno.appendChild(alerta);
+    }
+
+    if (aviso) {
+      var pre = document.createElement("div");
+      pre.textContent = "\n" + aviso;
+      interno.appendChild(pre);
+
+      var a = document.createElement("a");
+      a.href = "https://wa.me/" + WHATSAPP_NELSON + "?text=" + encodeURIComponent(aviso);
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = "→ Reenviar este aviso a Nelson por WhatsApp";
+      interno.appendChild(document.createElement("br"));
+      interno.appendChild(a);
+    }
+  }
+
+  function abrir() {
+    ventana.classList.add("abierta");
+    burbuja.classList.remove("con-novedad");
+    if (!hilo.childElementCount) {
+      agregar(SALUDO, "mcs-bot");
+      historial.push({ role: "assistant", content: SALUDO });
+    }
+    texto.focus();
+  }
+  function cerrarVentana() { ventana.classList.remove("abierta"); }
+
+  burbuja.addEventListener("click", function () {
+    ventana.classList.contains("abierta") ? cerrarVentana() : abrir();
+  });
+  cerrar.addEventListener("click", cerrarVentana);
+
+  texto.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); mandar(); }
+  });
+  enviar.addEventListener("click", mandar);
+
+  function mandar() {
+    var t = texto.value.trim();
+    if (!t || ocupado) return;
+    texto.value = "";
+    agregar(t, "mcs-yo");
+    historial.push({ role: "user", content: t });
+
+    ocupado = true;
+    enviar.disabled = true;
+    var escribiendo = document.createElement("div");
+    escribiendo.className = "mcs-escribiendo";
+    escribiendo.textContent = "Sol está escribiendo…";
+    hilo.appendChild(escribiendo);
+    hilo.scrollTop = hilo.scrollHeight;
+
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: historial })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        escribiendo.remove();
+        var respuesta = d.reply || "Disculpe, no pude responder. Escríbanos al +593 96 330 3081.";
+        agregar(respuesta, "mcs-bot");
+        historial.push({ role: "assistant", content: respuesta });
+
+        if (d.escalar) {
+          var av = document.createElement("div");
+          av.className = "mcs-aviso";
+          av.textContent = "📲 Le pasé su caso a Nelson. Él le responde personalmente dentro de su horario de atención.";
+          hilo.appendChild(av);
+          hilo.scrollTop = hilo.scrollHeight;
+          if (!ventana.classList.contains("abierta")) burbuja.classList.add("con-novedad");
+        }
+        if (d.revisar) {
+          mostrarInterno(d.avisoInterno, d.tipo, d.prioridad, d.avisosEnviados, d.palabrasClave, d.escalar);
+        }
+      })
+      .catch(function () {
+        escribiendo.remove();
+        agregar("Disculpe, hubo un problema de conexión. Por favor escríbanos por WhatsApp al +593 96 330 3081.", "mcs-bot");
+      })
+      .then(function () {
+        ocupado = false;
+        enviar.disabled = false;
+        texto.focus();
+      });
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
+      e.preventDefault();
+      panelInterno = !panelInterno;
+      interno.classList.toggle("visible", panelInterno);
+    }
+  });
+})();
+</script>
+</body>
+</html>
