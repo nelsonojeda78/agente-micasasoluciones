@@ -166,7 +166,7 @@ var WHATSAPP_NELSON = "593963303081";
     return d;
   }
 
-  function mostrarInterno(aviso, tipo, prioridad, enviados, palabras, escalo, modelo, intentos) {
+  function mostrarInterno(aviso, tipo, prioridad, enviados, palabras, escalo, modelo, intentos, idioma) {
     if (!panelInterno) return;
     if (!aviso && !(palabras && palabras.length) && !modelo) return;
     interno.classList.add("visible");
@@ -176,7 +176,8 @@ var WHATSAPP_NELSON = "593963303081";
     cab.textContent =
       "PANEL INTERNO · " + (tipo || "OTRO") + " · " + (prioridad || "MEDIA") +
       (enviados && enviados.length ? " · avisos enviados: " + enviados.length : " · sin canal de envío configurado") +
-      (modelo ? " · modelo: " + modelo + (intentos > 1 ? " (intento " + intentos + ")" : "") : "");
+      (modelo ? " · modelo: " + modelo + (intentos > 1 ? " (intento " + intentos + ")" : "") : "") +
+      (idioma && idioma !== "?" ? " · idioma: " + (idioma === "en" ? "INGLÉS" : "español") : "");
     interno.appendChild(cab);
 
     if (!escalo) {
@@ -261,7 +262,7 @@ var WHATSAPP_NELSON = "593963303081";
         }
         // El panel interno se actualiza en cada respuesta (muestra el modelo usado).
         // Solo se ve si el panel está activado con Ctrl+Shift+A o ?interno=1.
-        mostrarInterno(d.avisoInterno, d.tipo, d.prioridad, d.avisosEnviados, d.palabrasClave, d.escalar, d.modeloUsado, d.intentosDeModelo);
+        mostrarInterno(d.avisoInterno, d.tipo, d.prioridad, d.avisosEnviados, d.palabrasClave, d.escalar, d.modeloUsado, d.intentosDeModelo, d.idiomaDetectado);
       })
       .catch(function () {
         escribiendo.remove();
